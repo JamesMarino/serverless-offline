@@ -79,6 +79,8 @@ export default class DockerContainer {
       `${port}:9001`,
       '-e',
       'DOCKER_LAMBDA_STAY_OPEN=1', // API mode
+      '-e',
+      'DOCKER_LAMBDA_WATCH=1',
     ]
 
     if (this.#layers.length > 0) {
@@ -148,6 +150,8 @@ export default class DockerContainer {
     const dockerStart = execa('docker', ['start', '-a', containerId], {
       all: true,
     })
+
+    await execa('docker', ['update', '--restart=on-failure', containerId])
 
     await new Promise((resolve, reject) => {
       dockerStart.all.on('data', (data) => {
